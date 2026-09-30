@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Announcements.API/Announcements.API.csproj" />
+  <Project Path="Bookings.API/Bookings.API.csproj" />
+  <Project Path="Gateway.API/Gateway.API.csproj" />
+</Solution>

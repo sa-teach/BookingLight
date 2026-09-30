@@ -1,0 +1,6 @@
+@Announcements.API_HostAddress = http://localhost:5094
+
+GET {{Announcements.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
