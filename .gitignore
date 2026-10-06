@@ -13,6 +13,11 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+# Postman
+.postman/
+postman/
+*.postman_environment.json
+
 # Mono auto generated files
 mono_crash.*
 

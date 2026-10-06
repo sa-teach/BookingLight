@@ -1,21 +1,61 @@
-﻿using Bookings.API.Models;
+﻿using Bookings.API.Data;
+using Bookings.API.Models;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Bookings.API.Services
 {
     public class BookingService : IBookingService
     {
-        public Task<IEnumerable<Booking>> GetBookingsByAnnouncementAsync(Guid announcementId)
+        private readonly BookingsDbContext _context;
+
+        public BookingService(BookingsDbContext context)
         {
-            // TODO : Заменить заглушку на чтение из EF Core InMemory (фильтр по AnnouncementId).
-            return Task.FromResult<IEnumerable<Booking>>(new List<Booking>());
+            _context = context;
         }
 
-        public Task<Booking> CreateBookingAsync(Booking booking)
+        public async Task<IEnumerable<Booking>> GetBookingsByAnnouncementAsync(Guid announcementId)
         {
-            // TODO : Реализовать сохранение в EF Core InMemory и
-            // бизнес-логику валидации: пересечение дат (StartDate и EndDate) для одного и
-            // того же AnnouncementId не допускается!
-            throw new NotImplementedException();
+            return await _context.Bookings
+                .Where(b => b.AnnouncementId == announcementId)
+                .ToListAsync();
+        }
+
+        public async Task<Booking> CreateBookingAsync(Booking booking)
+        {
+            if (booking.CustomerName == "" || booking.CustomerName == null)
+            {
+                throw new ArgumentException("Customer name is empty");
+            }
+
+            if (booking.EndDate < booking.StartDate)
+            {
+                throw new ArgumentException("Start date is later then end date");
+            }
+
+            var bookings = _context.Bookings.ToList();
+            bool dateCheck = false;
+
+            foreach (var b in bookings)
+            {
+                if (b.AnnouncementId == booking.AnnouncementId && booking.StartDate < b.EndDate && booking.EndDate > b.StartDate)
+                {
+                    dateCheck = true;
+                    break;
+                }
+            }
+
+            if (dateCheck)
+            {
+                throw new ArgumentException("Booking dates overlap with existing booking");
+            }
+
+            booking.Id = Guid.NewGuid();
+
+            _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+
+            return booking;
         }
     }
 }

@@ -1,5 +1,6 @@
+using Bookings.API.Data;
 using Bookings.API.Services;
-
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// TODO : Когда добавите EF Core InMemory, зарегистрируйте здесь DbContext.
+
+builder.Services.AddDbContext<BookingsDbContext>(options =>
+    options.UseInMemoryDatabase("BookingsDb"));
+
 builder.Services.AddScoped<IBookingService, BookingService>();
 
 var app = builder.Build();
